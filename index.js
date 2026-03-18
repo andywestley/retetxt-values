@@ -1,9 +1,15 @@
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { search } from 'nlcst-search';
 import { normalize } from 'nlcst-normalize';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 /**
  * @typedef {Object} Options
  * @property {Record<string, string[]>} dictionary
+ * @property {boolean} [expand=false] Whether to expand the dictionary using a local thesaurus.
  */
 
 /**
@@ -13,16 +19,43 @@ import { normalize } from 'nlcst-normalize';
  */
 export default function retextValues(options) {
   const dictionary = options?.dictionary || {};
+  const shouldExpand = options?.expand || false;
   
   // Transform dictionary into a flat array of phrases for nlcst-search
   const phrases = [];
   // Keep a map of normalized phrase -> category so we can emit the right ruleId
   const phraseToCategory = new Map();
 
+  let thesaurus = {};
+  if (shouldExpand) {
+    try {
+      const thesaurusPath = path.join(__dirname, 'thesaurus.json');
+      thesaurus = JSON.parse(fs.readFileSync(thesaurusPath, 'utf8'));
+    } catch (error) {
+      console.warn('retext-values: Could not load thesaurus.json. Expansion disabled.');
+    }
+  }
+
   for (const [category, words] of Object.entries(dictionary)) {
     for (const word of words) {
-      phrases.push(word);
-      phraseToCategory.set(normalize(word), category);
+      const normalizedWord = normalize(word);
+      
+      // Add the original word
+      if (!phraseToCategory.has(normalizedWord)) {
+        phrases.push(word);
+        phraseToCategory.set(normalizedWord, category);
+      }
+
+      // Add synonyms if expanding
+      if (shouldExpand && thesaurus[normalizedWord]) {
+        for (const synonym of thesaurus[normalizedWord]) {
+          const normalizedSynonym = normalize(synonym);
+          if (!phraseToCategory.has(normalizedSynonym)) {
+            phrases.push(synonym);
+            phraseToCategory.set(normalizedSynonym, category);
+          }
+        }
+      }
     }
   }
 

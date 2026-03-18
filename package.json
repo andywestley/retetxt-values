@@ -20,7 +20,8 @@
   "license": "MIT",
   "dependencies": {
     "nlcst-normalize": "^4.0.0",
-    "nlcst-search": "^4.0.0"
+    "nlcst-search": "^4.0.0",
+    "thesaurus": "^0.0.1"
   },
   "devDependencies": {
     "retext": "^9.0.0"

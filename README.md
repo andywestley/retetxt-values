@@ -57,6 +57,29 @@ Type: `Record<string, string[]>`
 A map of categories (the keys) to arrays of string phrases (the values).
 The plugin will search the parsed text document for exact word phrase matches. It naturally tolerates capitalization and variation in spaces/punctuation (e.g. mapping "cutting-edge" to "cutting edge").
 
+##### `options.expand`
+
+Type: `boolean` (default: `false`)
+
+Whether to expand the dictionary using a local thesaurus. If `true`, the plugin will look for a `thesaurus.json` file in its root directory and add synonyms for every word in your dictionary.
+
+> [!NOTE]
+> Expansion happens once during initialization, making it highly performant for scans.
+
+## Thesaurus Generation
+
+To use the expansion feature, you must first generate the local `thesaurus.json` file. You can do this by running the provided extraction script:
+
+```sh
+# Install the extraction dependency
+npm install thesaurus
+
+# Generate the thesaurus JSON
+node scripts/extract-thesaurus.js
+```
+
+This will create an ~11MB `thesaurus.json` file containing over 140,000 word entries sourced from LibreOffice's OpenOffice thesaurus.
+
 ## License
 
 [MIT](LICENSE)
