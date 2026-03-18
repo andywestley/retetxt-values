@@ -1,0 +1,28 @@
+{
+  "name": "retext-values",
+  "version": "1.0.0",
+  "description": "retext plugin to analyze natural language against a dynamically provided values dictionary",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "test": "node --test test/index.js"
+  },
+  "keywords": [
+    "unified",
+    "retext",
+    "retext-plugin",
+    "nlcst",
+    "values",
+    "dictionary",
+    "brand"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "nlcst-normalize": "^4.0.0",
+    "nlcst-search": "^4.0.0"
+  },
+  "devDependencies": {
+    "retext": "^9.0.0"
+  }
+}
