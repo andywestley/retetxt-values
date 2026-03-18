@@ -4,6 +4,11 @@
   "description": "retext plugin to analyze natural language against a dynamically provided values dictionary",
   "type": "module",
   "main": "index.js",
+  "files": [
+    "index.js",
+    "scripts/",
+    "thesaurus.json"
+  ],
   "scripts": {
     "test": "node --test test/index.js"
   },
