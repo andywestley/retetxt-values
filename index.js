@@ -36,23 +36,31 @@ export default function retextValues(options) {
     }
   }
 
+  // First pass: Add all core dictionary keywords
   for (const [category, words] of Object.entries(dictionary)) {
     for (const word of words) {
       const normalizedWord = normalize(word);
-      
-      // Add the original word
       if (!phraseMetadata.has(normalizedWord)) {
         phrases.push(word);
-        phraseMetadata.set(normalizedWord, { category, primaryTerm: word, isExpanded: false });
       }
+      // Core matches always take precedence
+      phraseMetadata.set(normalizedWord, { category, primaryTerm: word, isExpanded: false });
+    }
+  }
 
-      // Add synonyms if expanding
-      if (shouldExpand && thesaurus[normalizedWord]) {
-        for (const synonym of thesaurus[normalizedWord]) {
-          const normalizedSynonym = normalize(synonym);
-          if (!phraseMetadata.has(normalizedSynonym)) {
-            phrases.push(synonym);
-            phraseMetadata.set(normalizedSynonym, { category, primaryTerm: word, isExpanded: true });
+  // Second pass: Add synonyms if enabled
+  if (shouldExpand) {
+    for (const [category, words] of Object.entries(dictionary)) {
+      for (const word of words) {
+        const normalizedWord = normalize(word);
+        if (thesaurus[normalizedWord]) {
+          for (const synonym of thesaurus[normalizedWord]) {
+            const normalizedSynonym = normalize(synonym);
+            // Only add as expanded if it's not already a core match
+            if (!phraseMetadata.has(normalizedSynonym)) {
+              phrases.push(synonym);
+              phraseMetadata.set(normalizedSynonym, { category, primaryTerm: word, isExpanded: true });
+            }
           }
         }
       }
