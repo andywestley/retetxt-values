@@ -1,0 +1,2 @@
+This is a generic sentence about the weather. It has no special meaning and should not match anything in our dictionary.
+Another line with no matches.

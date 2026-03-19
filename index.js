@@ -23,8 +23,8 @@ export default function retextValues(options) {
   
   // Transform dictionary into a flat array of phrases for nlcst-search
   const phrases = [];
-  // Keep a map of normalized phrase -> category so we can emit the right ruleId
-  const phraseToCategory = new Map();
+  // Keep a map of normalized phrase -> { category, primaryTerm, isExpanded }
+  const phraseMetadata = new Map();
 
   let thesaurus = {};
   if (shouldExpand) {
@@ -41,18 +41,18 @@ export default function retextValues(options) {
       const normalizedWord = normalize(word);
       
       // Add the original word
-      if (!phraseToCategory.has(normalizedWord)) {
+      if (!phraseMetadata.has(normalizedWord)) {
         phrases.push(word);
-        phraseToCategory.set(normalizedWord, category);
+        phraseMetadata.set(normalizedWord, { category, primaryTerm: word, isExpanded: false });
       }
 
       // Add synonyms if expanding
       if (shouldExpand && thesaurus[normalizedWord]) {
         for (const synonym of thesaurus[normalizedWord]) {
           const normalizedSynonym = normalize(synonym);
-          if (!phraseToCategory.has(normalizedSynonym)) {
+          if (!phraseMetadata.has(normalizedSynonym)) {
             phrases.push(synonym);
-            phraseToCategory.set(normalizedSynonym, category);
+            phraseMetadata.set(normalizedSynonym, { category, primaryTerm: word, isExpanded: true });
           }
         }
       }
@@ -63,8 +63,8 @@ export default function retextValues(options) {
     if (phrases.length === 0) return;
 
     search(tree, phrases, (match, index, parent, phrase) => {
-      // Find what category this matched phrase belongs to
-      const category = phraseToCategory.get(normalize(phrase));
+      // Find what category and metadata this matched phrase belongs to
+      const meta = phraseMetadata.get(normalize(phrase));
       
       // Extract the actual matched text from the VFile
       const startOffset = match[0].position.start.offset;
@@ -77,10 +77,19 @@ export default function retextValues(options) {
           start: match[0].position.start,
           end: match[match.length - 1].position.end
         },
-        `retext-values:${category}`
+        `retext-values:${meta.category}`
       );
+      message.source = 'retext-values';
+      message.ruleId = meta.category;
 
       message.actual = matchString;
+      message.expected = [meta.primaryTerm];
+
+      message.data = {
+        isExpanded: meta.isExpanded,
+        primaryTerm: meta.primaryTerm,
+        matchTerm: phrase
+      };
     }, {
       allowApostrophes: true,
       allowDashes: true

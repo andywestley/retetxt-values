@@ -66,6 +66,30 @@ Whether to expand the dictionary using a local thesaurus. If `true`, the plugin 
 > [!NOTE]
 > Expansion happens once during initialization, making it highly performant for scans.
 
+### Message Metadata
+
+When a match is found, the resulting [VFile Message](https://github.com/vfile/vfile-message) includes additional metadata in its `data` property:
+
+- `isExpanded` (`boolean`): `true` if the match was found via thesaurus expansion, `false` if it was an exact match from the dictionary.
+- `primaryTerm` (`string`): The original term from your dictionary that triggered this match.
+- `matchTerm` (`string`): The specific word or phrase that was actually matched in the text (e.g., a synonym if `isExpanded` is `true`).
+
+#### Example
+
+```js
+retext()
+  .use(retextValues, { 
+    dictionary: { trust: ['secure'] },
+    expand: true 
+  })
+  .process('Your data is reliable.')
+  .then((file) => {
+    const message = file.messages[0];
+    console.log(message.data);
+    // { isExpanded: true, primaryTerm: 'secure', matchTerm: 'reliable' }
+  });
+```
+
 ## Thesaurus Generation
 
 To use the expansion feature, you must first generate the local `thesaurus.json` file. You can do this by running the provided extraction script:
