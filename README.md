@@ -55,13 +55,16 @@ Analyzes natural language against a dynamically provided values dictionary.
 Type: `Record<string, string[]>`
 
 A map of categories (the keys) to arrays of string phrases (the values).
-The plugin will search the parsed text document for exact word phrase matches. It naturally tolerates capitalization and variation in spaces/punctuation (e.g. mapping "cutting-edge" to "cutting edge").
+The plugin will search the parsed text document for matches. It naturally tolerates capitalization and variation in spaces/punctuation (e.g., mapping "cutting-edge" to "cutting edge").
+
+**Stemming Support:**
+The plugin evaluates words based on their stems (using the Porter Stemmer algorithm). This means that different variants of a root word will automatically match. For example, if your dictionary includes `"innovate"`, it will naturally match `"innovating"`, `"innovates"`, or `"innovation"` in the text!
 
 ##### `options.expand`
 
 Type: `boolean` (default: `false`)
 
-Whether to expand the dictionary using a local thesaurus. If `true`, the plugin will look for a `thesaurus.json` file in its root directory and add synonyms for every word in your dictionary.
+Whether to expand the dictionary using a local thesaurus. If `true`, the plugin will look for a `thesaurus.json` file in its root directory and add synonyms for every word in your dictionary. These synonyms are also stemmed, providing a vast matching network!
 
 > [!NOTE]
 > Expansion happens once during initialization, making it highly performant for scans.

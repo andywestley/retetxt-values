@@ -25,8 +25,10 @@
   "license": "MIT",
   "dependencies": {
     "nlcst-normalize": "^4.0.0",
-    "nlcst-search": "^4.0.0",
-    "thesaurus": "^0.0.1"
+    "nlcst-to-string": "^4.0.0",
+    "stemmer": "^2.0.1",
+    "thesaurus": "^0.0.1",
+    "unist-util-visit": "^5.1.0"
   },
   "devDependencies": {
     "retext": "^9.0.0"

@@ -63,4 +63,24 @@ test('retext-values plugin', async (t) => {
     assert.equal(file.messages[1].ruleId, 'innovation');
     assert.equal(file.messages[1].actual, 'cutting-edge');
   });
+  await t.test('should match stemmed variants of dictionary values', async () => {
+    const dictionary = {
+      innovation: ['innovate'],
+      disruption: ['disrupt']
+    };
+
+    const text = 'We are innovating today. We appreciate your disruptive vision.';
+    
+    const file = await retext()
+      .use(retextValues, { dictionary })
+      .process(text);
+
+    assert.equal(file.messages.length, 2);
+    
+    assert.equal(file.messages[0].ruleId, 'innovation');
+    assert.equal(file.messages[0].actual, 'innovating'); // stems to "innov"
+    
+    assert.equal(file.messages[1].ruleId, 'disruption');
+    assert.equal(file.messages[1].actual, 'disruptive'); // stems to "disrupt"
+  });
 });
